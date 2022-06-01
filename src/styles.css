@@ -2,3 +2,23 @@
 @import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 @import '../node_modules/font-awesome/css/font-awesome.min.css';
 @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+.header {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    background-color: rgb(83, 161, 199);
+    color: white;
+}
+
+.btn-primary {
+    background-color: rgb(83, 161, 199);
+}
+
+body {
+    color:rgb(78, 74, 74)
+}
+
+.mt-5 {
+    margin-top: 5px;
+}
