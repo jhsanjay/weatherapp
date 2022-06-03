@@ -26,6 +26,7 @@ export class WeatherComponent implements OnInit {
   weatherIcon: any;
   weatherDescription: any;
   option: any;
+  changeUnit: boolean = false;
 
 
   constructor(public weatherService: WeatherService, public injector: Injector, public cd: ChangeDetectorRef, private _snackBar: MatSnackBar) { }
@@ -37,6 +38,7 @@ export class WeatherComponent implements OnInit {
   setUnit(unit: string) {
     if (this.unit !== unit) {
       this.unit = unit;
+      this.changeUnit = true;
       init(this);
     }
   }
@@ -122,7 +124,7 @@ export class WeatherComponent implements OnInit {
 
   searchBy(option) {
     console.log(option);
-    
+
     if (this.option != option)
       this.option = option;
   }
@@ -130,24 +132,26 @@ export class WeatherComponent implements OnInit {
 
 function init(context: WeatherComponent) {
   context.weatherDetails = [];
-  let savedCities = localStorage.getItem('savedCities');
+  if (!context.changeUnit) {
+    let savedCities = localStorage.getItem('savedCities');
 
-  if (savedCities) {
-    context.savedCities = savedCities.split(',').map(e => e.trim());
-    context.savedCities.forEach(element => {
-      if (!context.citiesList.map(e => e.toLowerCase()).includes(element.toLowerCase())) {
-        context.citiesList.push(element);
+    if (savedCities) {
+      context.savedCities = savedCities.split(',').map(e => e.trim());
+      context.savedCities.forEach(element => {
+        if (!context.citiesList.map(e => e.toLowerCase()).includes(element.toLowerCase())) {
+          context.citiesList.push(element);
+        }
+      });
+
+      if (context.tempCities) {
+        let listT = context.tempCities.filter(e => !context.citiesList.map(e => e.toLowerCase()).includes(e.toLowerCase()))
+        context.citiesList.push(...listT)
       }
-    });
-
-    if (context.tempCities) {
-      let listT = context.tempCities.filter(e => !context.citiesList.map(e => e.toLowerCase()).includes(e.toLowerCase()))
-      context.citiesList.push(...listT)
+    } else {
+      context.citiesList.push(...context.tempCitiesList);
     }
-  } else {
-    context.citiesList.push(...context.tempCitiesList);
   }
-
+  context.changeUnit = false;
   context.citiesList.forEach(element => {
     let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
     context.weatherService.getLatLon(element).subscribe(response => {
