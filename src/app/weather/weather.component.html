@@ -3,7 +3,7 @@
         <div class="row mt-5">
             <div class="col-md-4">
                 <input type="text" formControlName="cityName" class="form-control" name="cityName"
-                    placeholder="Search by city" required>
+                    placeholder="Search by city" required (keydown.enter)="addCity()">
             </div>
             <div class="col-md-2">
                 <button type="button" (click)="addCity()" class="btn btn-primary">Add City</button>
@@ -17,9 +17,9 @@
     <button class="btn btn-secondary" (click)="presetCities()">Pre-set Cities</button>
     <button class="btn btn-secondary" style="margin-left:15px;" (click)="clearCities()">Clear All</button>
     <button class="btn btn-secondary" style="text-align: right;margin-left:15px;"
-        (click)="setUnit('metric')">°C</button>
+        (click)="setUnit('metric')" [disabled]="unit=='metric'">°C</button>
     <button class="btn btn-secondary" style="text-align: right;margin-left:15px;"
-        (click)="setUnit('imperial')">°F</button>
+        (click)="setUnit('imperial')" [disabled]="unit!='metric'">°F</button>
     <div class="row mt-5 d-flex  justify-content-start">
         <div style="text-align: right; cursor: pointer;"><i class="fa fa-refresh fa-2x" (click)="refreshBoard()"
                 matTooltip="Refresh Board" matTooltipPosition="below"></i></div>

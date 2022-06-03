@@ -8,18 +8,23 @@ import { Observable, of, catchError, forkJoin } from 'rxjs';
   providedIn: 'root'
 })
 export class ApiService {
-
+  dataReceived = false;
   constructor(private httpClient: HttpClient, private constants: Constants) { }
 
   hitGetApi(url: any, apiResponseCallback: ApiResponseCallback) {
     if (navigator.onLine) {
       this.httpClient.get(url).subscribe((res: any) => {
-        if (res && res.hasOwnProperty('Error_code'))
+        if (res && res.hasOwnProperty('Error_code')){
+          this.dataReceived = false;
           apiResponseCallback.onError(res.Error_code, res.Message);
-        else
+        }
+        else{
+          this.dataReceived = true;
           apiResponseCallback.onSuccess(res);
+        }
       })
     } else {
+      this.dataReceived = false;
       apiResponseCallback.onError(this.constants.noInternetConnectionError, this.constants.errorNoInternetConnectionAvailable);
     }
   }

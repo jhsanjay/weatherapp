@@ -16,7 +16,7 @@ export class WeatherComponent implements OnInit {
   unit: string = 'metric';
   today = moment().format('MMMM Do YYYY, h:mm:ss a');
   geoDetails: any;
-  tempCitiesList = ['Bengaluru', 'Basildon'];
+  tempCitiesList = ['Mangalore', 'Basildon'];
   weatherDetails: { name: string, weather: string, lat: string, lon: string, temp: string, pollution: Array<any>, forcast: Array<any>, icon: string, humidity: string, wind: string }[] = [];
   savedCities: string[] = [];
   tempCities: string[] = [];
@@ -37,7 +37,6 @@ export class WeatherComponent implements OnInit {
   setUnit(unit: string) {
     if (this.unit !== unit) {
       this.unit = unit;
-      // getWeather(this.geoDetails.lat, this.geoDetails.lon, this);
       init(this);
     }
   }

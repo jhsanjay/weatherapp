@@ -26,7 +26,6 @@ import {MatTabsModule} from '@angular/material/tabs';
     MatTabsModule,
     BrowserAnimationsModule
   ],
-  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
