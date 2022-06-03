@@ -13,6 +13,10 @@
 
 .btn-primary {
     background-color: rgb(83, 161, 199);
+   
+}
+.btn-primary:hover {
+    background-color: rgb(67, 124, 152);
 }
 
 body {

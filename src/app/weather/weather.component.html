@@ -1,8 +1,87 @@
-<div class="container-fluid mt-5">
-    <div class="card divBackground">
-        <div class="container">
-            <h1>cityName</h1>
-            <p>Lat Lon</p>
+<div class="container-fluid">
+    <form [formGroup]="formGroup" *ngIf="formGroup">
+        <div class="row mt-5">
+            <div class="col-md-4">
+                <input type="text" formControlName="cityName" class="form-control" name="cityName"
+                    placeholder="Search by city" required>
+            </div>
+            <div class="col-md-2">
+                <button type="button" (click)="addCity()" class="btn btn-primary">Add City</button>
+            </div>
+            <div class="col-md-6" style="text-align: right">
+                <h4>{{today}}</h4>
+            </div>
+        </div>
+    </form>
+    <hr>
+    <button class="btn btn-secondary" (click)="presetCities()">Pre-set Cities</button>
+    <button class="btn btn-secondary" style="margin-left:15px;" (click)="clearCities()">Clear All</button>
+    <button class="btn btn-secondary" style="text-align: right;margin-left:15px;"
+        (click)="setUnit('metric')">°C</button>
+    <button class="btn btn-secondary" style="text-align: right;margin-left:15px;"
+        (click)="setUnit('imperial')">°F</button>
+    <div class="row mt-5 d-flex  justify-content-start">
+        <div style="text-align: right; cursor: pointer;"><i class="fa fa-refresh fa-2x" (click)="refreshBoard()"
+                matTooltip="Refresh Board" matTooltipPosition="below"></i></div>
+        <div class="card m-5" style="margin: 5px;" *ngFor="let city of weatherDetails" class="divBackground">
+            <div class="container">
+                <div style="text-align:right"><i class="fa fa-heart" matTooltip="Click to Save as favourite city"
+                        matTooltipPosition="below" [ngStyle]="{'color': isSavedCity(city.name)?'red':''}"
+                        (click)="saveCity(city.name)" style="cursor: pointer;"></i></div>
+                <h1>{{city.name}}</h1>
+                <p>(Lat: {{city.lat}} Lon: {{city.lon}})</p>
+                <span>
+                    <h3>
+                        <img src="{{'http://openweathermap.org/img/wn/'+city.icon+'.png'}}" [matTooltip]="city.weather"
+                            matTooltipPosition="below">
+                        {{city.temp}}
+                        <span *ngIf="unit=='metric'">°C</span>
+                        <span *ngIf="unit=='imperial'">°F</span>
+                    </h3>
+                </span>
+                <p>Humidity:{{city.humidity}}%</p>
+                <p>Wind: {{city.wind}} m/s</p>
+                <hr>
+                <mat-tab-group>
+                    <mat-tab label="Forcast">
+                        <div class="d-flex flex-row">
+                            <div *ngFor="let forcast of city.forcast" class=" mt-5">
+                                <div class="card"
+                                    style="padding: 5px; width:180px; margin-right: 5px; background-color: transparent">
+                                    <div class="container" style="text-align: center;">
+                                        <b>{{forcast.dt_txt | date:'dd/MM'}}</b><br>
+                                        <b>{{forcast.dt_txt | date:'h a'}}</b><br>
+                                        <img src="{{'http://openweathermap.org/img/wn/'+forcast.weather[0].icon+'.png'}}"
+                                            [matTooltip]="forcast.weather[0].description"
+                                            matTooltipPosition="below"><br>
+                                        {{forcast.main.temp_max}}° {{forcast.main.temp_max}}°<br>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Pollution">
+                        <table style="width: 100%;" class="mt-5 table">
+                            <tr>
+                                <td><b>co</b>: {{city.pollution['co']}}</td>
+                                <td><b>nh3</b>: {{city.pollution['nh3']}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>no</b>: {{city.pollution['no']}}</td>
+                                <td><b>no2</b>: {{city.pollution['no2']}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>o3</b>: {{city.pollution['o3']}}</td>
+                                <td><b>pm2_5</b>: {{city.pollution['pm2_5']}}</td>
+                            </tr>
+                            <tr>
+                                <td><b>pm10</b>: {{city.pollution['pm10']}}</td>
+                                <td><b>so2</b>: {{city.pollution['so2']}}</td>
+                            </tr>
+                        </table>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
         </div>
     </div>
 </div>
