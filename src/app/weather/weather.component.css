@@ -1,4 +1,5 @@
 .divBackground {
+    background-image: url(../../assets/images/bg.jpeg);
     opacity: 0.8;
     border: 1px solid darkgrey;
     width: 400px;
