@@ -1,11 +1,22 @@
 import { ChangeDetectorRef, Component, Injector, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as moment from 'moment';
 import { Constants } from '../../helpers/constants';
-import { ValidationService } from '../../helpers/validation.service';
 import { WeatherService } from './weather.service';
 
+export class WeatherDetails {
+  name: string = '';
+  weather: string = '';
+  lat: string = '';
+  lon: string = '';
+  temp: string = '';
+  pollution: Array<any> = [];
+  forcast: Array<any> = [];
+  icon: string = '';
+  humidity: string = '';
+  wind: string = '';
+}
 @Component({
   selector: 'app-weather',
   templateUrl: './weather.component.html',
@@ -19,7 +30,8 @@ export class WeatherComponent implements OnInit {
   today = moment().format('MMMM Do YYYY, h:mm:ss a');
   geoDetails: any;
   tempCitiesList = ['Mangalore', 'Basildon'];
-  weatherDetails: { name: string, weather: string, lat: string, lon: string, temp: string, pollution: Array<any>, forcast: Array<any>, icon: string, humidity: string, wind: string }[] = [];
+  // weatherDetails: { name: string, weather: string, lat: string, lon: string, temp: string, pollution: Array<any>, forcast: Array<any>, icon: string, humidity: string, wind: string }[] = [];
+  weatherDetails: Array<WeatherDetails> = [];
   savedCities: string[] = [];
   tempCities: string[] = [];
   durationInSeconds = 5;
@@ -36,9 +48,7 @@ export class WeatherComponent implements OnInit {
     public injector: Injector,
     public cd: ChangeDetectorRef,
     private _snackBar: MatSnackBar,
-    public validationService: ValidationService,
     public constant: Constants
-
   ) { }
 
   ngOnInit(): void {
@@ -55,11 +65,15 @@ export class WeatherComponent implements OnInit {
 
   // event called when add city button clicked
   addCity() {
-    if (this.formGroup.valid) {
-      this.submitClicked = true;
-      let cityName = this.formGroup.get('cityName').value;
+    console.log(this.formGroup.valid);
+    console.log(this.formGroup);
+
+    this.submitClicked = true;
+    let cityName = this.formGroup.get('cityName').value.trim();
+    if (this.formGroup.valid && cityName.length > 0) {
       if (!this.weatherDetails.map(e => e.name.toLowerCase()).includes(cityName.toLowerCase())) {
-        let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
+        // let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
+        let temp = new WeatherDetails();
         this.weatherService.getLatLon(cityName).subscribe(response => {
           this.geoDetails = response[0];
           if (response[0]) {
@@ -69,6 +83,10 @@ export class WeatherComponent implements OnInit {
               this.tempCities.push(cityName)
               this.cd.markForCheck();
             });
+            this.formGroup.patchValue({
+              'cityName': ''
+            })
+            this.submitClicked = false;
           } else {
             this.openSnackBar('City not found')
           }
@@ -76,13 +94,11 @@ export class WeatherComponent implements OnInit {
       } else {
         this.openSnackBar(cityName.charAt(0).toUpperCase() + cityName.substring(1, cityName.length) + ' already added to list')
       }
-      this.formGroup.patchValue({
-        'cityName': ''
-      })
+
     }
 
   }
-
+  // messages
   openSnackBar(messageString: string) {
     this._snackBar.open(messageString, "Error", {
       duration: this.durationInSeconds * 1000,
@@ -102,6 +118,7 @@ export class WeatherComponent implements OnInit {
     this.cd.markForCheck();
   }
 
+  // check if the city is favourite saved
   isSavedCity(cityName) {
     if (this.savedCities?.find(e => e.toLowerCase() === cityName.toLowerCase())) {
       return true;
@@ -110,17 +127,18 @@ export class WeatherComponent implements OnInit {
   }
 
   refreshBoard() {
-    this.weatherDetails = [];
+    // this.weatherDetails = [];
     this.citiesList = [];
     this.today = moment().format('MMMM Do YYYY, h:mm:ss a');
     init(this);
   }
 
+  // load preset cities
   presetCities() {
     this.citiesList = [];
     init(this);
   }
-
+  // clear all presets, favourites
   clearCities() {
     this.citiesList = [];
     this.tempCities = [];
@@ -135,7 +153,7 @@ function init(context: WeatherComponent) {
   context.weatherService.setformGroup(context.formGroup);
   context.weatherDetails = [];
   if (!context.changeUnit) {
-   
+
     let savedCities = localStorage.getItem('savedCities');
 
     if (savedCities) {
@@ -156,7 +174,8 @@ function init(context: WeatherComponent) {
   }
   context.changeUnit = false;
   context.citiesList.forEach(element => {
-    let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
+    // let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
+    let temp = new WeatherDetails();
     context.weatherService.getLatLon(element).subscribe(response => {
       context.geoDetails = response[0];
       temp.name = context.geoDetails.name;
@@ -171,7 +190,7 @@ function init(context: WeatherComponent) {
 
 function addFormValidation(context: WeatherComponent) {
   context.formGroup = new FormGroup({
-    cityName: new FormControl('', context.validationService.addRequiredValidation())
+    cityName: new FormControl('', Validators.required)
   })
 }
 

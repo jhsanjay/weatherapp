@@ -4,13 +4,16 @@
             <div class="col-md-4">
                 <input type="text" formControlName="cityName" class="form-control" name="cityName"
                     placeholder="Search by city" required (keydown.enter)="addCity()" required>
-                <div class="error" *ngIf="formGroup.get('cityName').errors && submitClicked">{{constant.cityNameError}}</div>
+                <div class="error" 
+                *ngIf="formGroup.get('cityName').hasError('required') && submitClicked">
+                {{constant.cityNameError}}</div>
             </div>
             <div class="col-md-4 ml-2">
-                <button type="button" (click)="addCity()" class="btn btn-primary">Add City</button>
+                <button type="button" (click)="addCity()" class="btn btn-primary"
+                >Add City</button>
             </div>
         </div>
-            <div class="row mt-5" style="text-align: right">
+            <div class="row" style="text-align: right">
                 <i>{{today}}</i>
             </div>
     </form>
