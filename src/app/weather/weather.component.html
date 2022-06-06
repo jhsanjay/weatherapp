@@ -16,13 +16,15 @@
         </div>
     </form>
     <hr>
-    <button class="btn btn-secondary" (click)="presetCities()">Pre-set Cities</button>
-    <button class="btn btn-secondary" style="margin-left:15px;" (click)="clearCities()">Clear All</button>
-    <button class="btn btn-secondary" style="text-align: right;margin-left:15px;" (click)="setUnit('metric')"
-        [disabled]="unit=='metric'">°C</button>
-    <button class="btn btn-secondary" style="text-align: right;margin-left:15px;" (click)="setUnit('imperial')"
-        [disabled]="unit!='metric'">°F</button>
-    <div class="row mt-5 d-flex justify-content-center justify-content-md-start">
+    <div class="mt-5 d-flex justify-content-center justify-content-md-start">
+        <button class="btn btn-secondary" (click)="presetCities()">Pre-set Cities</button>
+        <button class="btn btn-secondary" style="margin-left:15px;" (click)="clearCities()">Clear All</button>
+        <button class="btn btn-secondary" style="text-align: right;margin-left:15px;" (click)="setUnit('metric')"
+            [disabled]="unit=='metric'">°C</button>
+        <button class="btn btn-secondary" style="text-align: right;margin-left:15px;" (click)="setUnit('imperial')"
+            [disabled]="unit!='metric'">°F</button>
+    </div>
+    <div class="row d-flex justify-content-center justify-content-md-start">
         <div style="text-align: right; cursor: pointer;"><i class="fa fa-refresh fa-2x" (click)="refreshBoard()"
                 matTooltip="Refresh Board" matTooltipPosition="below"></i></div>
         <div class="card m-5" style="margin: 5px;" *ngFor="let city of weatherDetails; let rec = index;"
@@ -65,7 +67,7 @@
                         </div>
                     </mat-tab>
                     <mat-tab label="Pollution">
-                        <table style="width: 100%;" class="mt-5 table">
+                        <table class="mt-5 table w-100">
                             <tr>
                                 <td><b>co</b>: {{city.pollution['co']}}</td>
                                 <td><b>nh3</b>: {{city.pollution['nh3']}}</td>

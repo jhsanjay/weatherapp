@@ -65,10 +65,9 @@ export class WeatherComponent implements OnInit {
 
   // remove city from list
   removeCity(index) {
-    console.log(index);
-
     this.weatherDetails.splice(index, 1);
   }
+  
   // event called when add city button clicked
   addCity() {
     this.submitClicked = true;
@@ -114,7 +113,7 @@ export class WeatherComponent implements OnInit {
       this.savedCities.push(cityName);
     } else {
       let a = this.savedCities.find(e => e.toLowerCase() === cityName.toLowerCase());
-      this.savedCities.splice(this.savedCities.map(e => e.toLowerCase()).indexOf(a.toLowerCase()));
+      this.savedCities.splice(this.savedCities.map(e => e.toLowerCase()).indexOf(a.toLowerCase()), 1);
     }
     localStorage.setItem('savedCities', this.savedCities.join())
 

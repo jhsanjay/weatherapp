@@ -31,7 +31,31 @@ body {
     display: none;
 }
 
+.ml-2{
+    margin-left: 20px;
+}
+
 .error{
     color: red;
     padding-top: 3px;
+}
+
+.w-100{
+    width: 100%;
+}
+
+.footer{
+    height: 80px;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin: 0 auto;
+    padding-top:20px;
+    font-weight: 200;
+    background-color: rgb(67, 124, 152);
+}
+
+.weatherClass{
+    color: white;
+    text-decoration: none !important;
 }
