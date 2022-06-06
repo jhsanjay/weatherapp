@@ -1,7 +1,18 @@
 .divBackground {
-    background-image: url(../../assets/images/bg.jpeg);
+    background-image: url(../../assets/images/bg.jpg);
+    background-repeat: no-repeat;
+    background-size: cover;
     opacity: 0.8;
     border: 1px solid darkgrey;
     width: 400px;
     padding: 15px;
+    color: black
+}
+
+.cardBg {
+    padding: 5px;
+    width: 180px;
+    margin-right: 5px;
+    background-color: transparent;
+    color: black
 }

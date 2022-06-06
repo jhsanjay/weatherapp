@@ -1,16 +1,17 @@
 <div class="container-fluid">
-    <form [formGroup]="formGroup" *ngIf="formGroup">
+    <form [formGroup]="formGroup">
         <div class="d-flex flex-row mt-5  d-flex justify-content-center justify-content-md-start">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <input type="text" formControlName="cityName" class="form-control" name="cityName"
-                    placeholder="Search by city" required (keydown.enter)="addCity()">
+                    placeholder="Search by city" required (keydown.enter)="addCity()" required>
+                <div class="error" *ngIf="formGroup.get('cityName').errors && submitClicked">{{constant.cityNameError}}</div>
             </div>
-            <div class="col-md-6 ml-2">
+            <div class="col-md-4 ml-2">
                 <button type="button" (click)="addCity()" class="btn btn-primary">Add City</button>
             </div>
         </div>
             <div class="row mt-5" style="text-align: right">
-                <h4>{{today}}</h4>
+                <i>{{today}}</i>
             </div>
     </form>
     <hr>
@@ -32,7 +33,9 @@
                 <p>(Lat: {{city.lat}} Lon: {{city.lon}})</p>
                 <span>
                     <h3>
-                        <img src="{{'https://openweathermap.org/img/wn/'+city.icon+'.png'}}" [matTooltip]="city.weather"
+                        <!-- <img src="{{'https://openweathermap.org/img/wn/'+city.icon+'.png'}}" [matTooltip]="city.weather"
+                            matTooltipPosition="below"> -->
+                        <img src="{{'assets/images/icon_list/'+city.icon+'.png'}}" [matTooltip]="city.weather"
                             matTooltipPosition="below">
                         {{city.temp}}
                         <span *ngIf="unit=='metric'">°C</span>
@@ -46,12 +49,11 @@
                     <mat-tab label="Forcast">
                         <div class="d-flex flex-row justify-content-center justify-content-md-start">
                             <div *ngFor="let forcast of city.forcast" class=" mt-5">
-                                <div class="card"
-                                    style="padding: 5px; width:180px; margin-right: 5px; background-color: transparent; color: black">
+                                <div class="card cardBg">
                                     <div class="container" style="text-align: center;">
                                         <b>{{forcast.dt_txt | date:'dd/MM'}}</b><br>
                                         <b>{{forcast.dt_txt | date:'h a'}}</b><br>
-                                        <img src="{{'https://openweathermap.org/img/wn/'+forcast.weather[0].icon+'.png'}}"
+                                        <img src="{{'assets/images/icon_list/'+forcast.weather[0].icon+'.png'}}"
                                             [matTooltip]="forcast.weather[0].description"
                                             matTooltipPosition="below"><br>
                                         {{forcast.main.temp_max}}° {{forcast.main.temp_max}}°<br>

@@ -4,10 +4,13 @@ import { Injectable } from "@angular/core";
     providedIn: 'root'
 })
 
-export class Constants{
+export class Constants {
     public noInternetConnectionError = 101;
     public unauthorized = 401;
     public errorNotFound = 404;
     public errorDuplicate = 302;
     public errorNoInternetConnectionAvailable = "No Available Internet Connection";
+    public errorEmpty = "cannot be empty";
+    public cityNameError = "Please enter a city name";
+
 }

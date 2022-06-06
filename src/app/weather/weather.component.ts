@@ -1,7 +1,9 @@
 import { ChangeDetectorRef, Component, Injector, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import * as moment from 'moment';
+import { Constants } from '../../helpers/constants';
+import { ValidationService } from '../../helpers/validation.service';
 import { WeatherService } from './weather.service';
 
 @Component({
@@ -27,9 +29,17 @@ export class WeatherComponent implements OnInit {
   weatherDescription: any;
   option: any;
   changeUnit: boolean = false;
+  submitClicked: boolean = false;
 
 
-  constructor(public weatherService: WeatherService, public injector: Injector, public cd: ChangeDetectorRef, private _snackBar: MatSnackBar) { }
+  constructor(public weatherService: WeatherService,
+    public injector: Injector,
+    public cd: ChangeDetectorRef,
+    private _snackBar: MatSnackBar,
+    public validationService: ValidationService,
+    public constant: Constants
+
+  ) { }
 
   ngOnInit(): void {
     init(this);
@@ -43,12 +53,11 @@ export class WeatherComponent implements OnInit {
     }
   }
 
+  // event called when add city button clicked
   addCity() {
-    // console.log(this.savedCities)
     if (this.formGroup.valid) {
+      this.submitClicked = true;
       let cityName = this.formGroup.get('cityName').value;
-      // console.log(cityName);
-
       if (!this.weatherDetails.map(e => e.name.toLowerCase()).includes(cityName.toLowerCase())) {
         let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
         this.weatherService.getLatLon(cityName).subscribe(response => {
@@ -79,17 +88,14 @@ export class WeatherComponent implements OnInit {
       duration: this.durationInSeconds * 1000,
     });
   }
+
   // save city
-
   saveCity(cityName: string) {
-    // console.log(this.savedCities);
-
     if (!this.savedCities.map(e => e.toLowerCase())?.includes(cityName.toLowerCase())) {
       this.savedCities.push(cityName);
     } else {
       let a = this.savedCities.find(e => e.toLowerCase() === cityName.toLowerCase());
       this.savedCities.splice(this.savedCities.map(e => e.toLowerCase()).indexOf(a.toLowerCase()));
-      // console.log(this.savedCities);
     }
     localStorage.setItem('savedCities', this.savedCities.join())
 
@@ -106,6 +112,7 @@ export class WeatherComponent implements OnInit {
   refreshBoard() {
     this.weatherDetails = [];
     this.citiesList = [];
+    this.today = moment().format('MMMM Do YYYY, h:mm:ss a');
     init(this);
   }
 
@@ -121,18 +128,14 @@ export class WeatherComponent implements OnInit {
     localStorage.setItem("savedCities", "");
     this.cd.markForCheck();
   }
-
-  searchBy(option) {
-    console.log(option);
-
-    if (this.option != option)
-      this.option = option;
-  }
 }
 
 function init(context: WeatherComponent) {
+  addFormValidation(context);
+  context.weatherService.setformGroup(context.formGroup);
   context.weatherDetails = [];
   if (!context.changeUnit) {
+   
     let savedCities = localStorage.getItem('savedCities');
 
     if (savedCities) {
@@ -163,14 +166,12 @@ function init(context: WeatherComponent) {
         context.weatherDetails.push(addToTemp(temp, resp, context));
       });
     });
-    addFormValidation(context);
-    context.weatherService.setformGroup(context.formGroup);
   });
 }
 
 function addFormValidation(context: WeatherComponent) {
   context.formGroup = new FormGroup({
-    cityName: new FormControl('', Validators.required)
+    cityName: new FormControl('', context.validationService.addRequiredValidation())
   })
 }
 
