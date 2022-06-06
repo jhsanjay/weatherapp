@@ -4,30 +4,31 @@
             <div class="col-md-4">
                 <input type="text" formControlName="cityName" class="form-control" name="cityName"
                     placeholder="Search by city" required (keydown.enter)="addCity()" required>
-                <div class="error" 
-                *ngIf="formGroup.get('cityName').hasError('required') && submitClicked">
-                {{constant.cityNameError}}</div>
+                <div class="error" *ngIf="formGroup.get('cityName').hasError('required') && submitClicked">
+                    {{constant.cityNameError}}</div>
             </div>
             <div class="col-md-4 ml-2">
-                <button type="button" (click)="addCity()" class="btn btn-primary"
-                >Add City</button>
+                <button type="button" (click)="addCity()" class="btn btn-primary">Add City</button>
             </div>
         </div>
-            <div class="row" style="text-align: right">
-                <i>{{today}}</i>
-            </div>
+        <div class="row" style="text-align: right">
+            <i>{{today}}</i>
+        </div>
     </form>
     <hr>
     <button class="btn btn-secondary" (click)="presetCities()">Pre-set Cities</button>
     <button class="btn btn-secondary" style="margin-left:15px;" (click)="clearCities()">Clear All</button>
-    <button class="btn btn-secondary" style="text-align: right;margin-left:15px;"
-        (click)="setUnit('metric')" [disabled]="unit=='metric'">°C</button>
-    <button class="btn btn-secondary" style="text-align: right;margin-left:15px;"
-        (click)="setUnit('imperial')" [disabled]="unit!='metric'">°F</button>
+    <button class="btn btn-secondary" style="text-align: right;margin-left:15px;" (click)="setUnit('metric')"
+        [disabled]="unit=='metric'">°C</button>
+    <button class="btn btn-secondary" style="text-align: right;margin-left:15px;" (click)="setUnit('imperial')"
+        [disabled]="unit!='metric'">°F</button>
     <div class="row mt-5 d-flex justify-content-center justify-content-md-start">
         <div style="text-align: right; cursor: pointer;"><i class="fa fa-refresh fa-2x" (click)="refreshBoard()"
                 matTooltip="Refresh Board" matTooltipPosition="below"></i></div>
-        <div class="card m-5" style="margin: 5px;" *ngFor="let city of weatherDetails" class="divBackground">
+        <div class="card m-5" style="margin: 5px;" *ngFor="let city of weatherDetails; let rec = index;"
+            class="divBackground">
+            <div><i (click)="removeCity(rec)" style="cursor: pointer;text-align: left;" matTooltip="Remove city"
+                    matTooltipPosition="below">x</i></div>
             <div class="container">
                 <div style="text-align:right"><i class="fa fa-heart" matTooltip="Click to Save as favourite city"
                         matTooltipPosition="below" [ngStyle]="{'color': isSavedCity(city.name)?'red':''}"
@@ -36,8 +37,6 @@
                 <p>(Lat: {{city.lat}} Lon: {{city.lon}})</p>
                 <span>
                     <h3>
-                        <!-- <img src="{{'https://openweathermap.org/img/wn/'+city.icon+'.png'}}" [matTooltip]="city.weather"
-                            matTooltipPosition="below"> -->
                         <img src="{{'assets/images/icon_list/'+city.icon+'.png'}}" [matTooltip]="city.weather"
                             matTooltipPosition="below">
                         {{city.temp}}

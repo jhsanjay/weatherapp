@@ -63,11 +63,14 @@ export class WeatherComponent implements OnInit {
     }
   }
 
+  // remove city from list
+  removeCity(index) {
+    console.log(index);
+
+    this.weatherDetails.splice(index, 1);
+  }
   // event called when add city button clicked
   addCity() {
-    console.log(this.formGroup.valid);
-    console.log(this.formGroup);
-
     this.submitClicked = true;
     let cityName = this.formGroup.get('cityName').value.trim();
     if (this.formGroup.valid && cityName.length > 0) {
@@ -177,23 +180,25 @@ function init(context: WeatherComponent) {
     // let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
     let temp = new WeatherDetails();
     context.weatherService.getLatLon(element).subscribe(response => {
-      context.geoDetails = response[0];
-      temp.name = context.geoDetails.name;
-      context.weatherService.getWeatherPollution(context.geoDetails.lat, context.geoDetails.lon, context.unit).subscribe(resp => {
-        console.log(resp);
-
-        context.weatherDetails.push(addToTemp(temp, resp, context));
-      });
+      if (response[0]) {
+        context.geoDetails = response[0];
+        temp.name = context.geoDetails.name;
+        context.weatherService.getWeatherPollution(context.geoDetails.lat, context.geoDetails.lon, context.unit).subscribe(resp => {
+          if (resp)
+            context.weatherDetails.push(addToTemp(temp, resp, context));
+        });
+      }
     });
   });
 }
 
+// validation
 function addFormValidation(context: WeatherComponent) {
   context.formGroup = new FormGroup({
     cityName: new FormControl('', Validators.required)
   })
 }
-
+// adding details to temp obj to add to list 
 function addToTemp(temp, resp: Array<any>, context: WeatherComponent) {
   console.log(resp);
 
