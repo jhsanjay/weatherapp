@@ -1,22 +1,12 @@
-import { ChangeDetectorRef, Component, Injector, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import * as moment from 'moment';
+import { Subscription } from 'rxjs';
 import { Constants } from '../../helpers/constants';
+import { HelperService } from '../../helpers/helper.service';
+import { WeatherDetails } from '../../helpers/weather-details.model';
 import { WeatherService } from './weather.service';
 
-export class WeatherDetails {
-  name: string = '';
-  weather: string = '';
-  lat: string = '';
-  lon: string = '';
-  temp: string = '';
-  pollution: Array<any> = [];
-  forcast: Array<any> = [];
-  icon: string = '';
-  humidity: string = '';
-  wind: string = '';
-}
 @Component({
   selector: 'app-weather',
   templateUrl: './weather.component.html',
@@ -25,29 +15,22 @@ export class WeatherDetails {
 export class WeatherComponent implements OnInit {
 
   formGroup: FormGroup;
-  weatherResponse: any;
   unit: string = 'metric';
-  today = moment().format('MMMM Do YYYY, h:mm:ss a');
-  geoDetails: any;
-  tempCitiesList = ['Mangalore', 'Basildon'];
-  // weatherDetails: { name: string, weather: string, lat: string, lon: string, temp: string, pollution: Array<any>, forcast: Array<any>, icon: string, humidity: string, wind: string }[] = [];
+  today;
+  presetCitiesList = ['Mangalore', 'Singapore', 'Bangalore'];
   weatherDetails: Array<WeatherDetails> = [];
   savedCities: string[] = [];
   tempCities: string[] = [];
-  durationInSeconds = 5;
   citiesList = [];
-  forcastDetails = [];
-  weatherIcon: any;
-  weatherDescription: any;
-  option: any;
   changeUnit: boolean = false;
   submitClicked: boolean = false;
-
+  subscription: Subscription;
+  subscription1: Subscription;
+  preset: boolean;
 
   constructor(public weatherService: WeatherService,
-    public injector: Injector,
     public cd: ChangeDetectorRef,
-    private _snackBar: MatSnackBar,
+    private helperService: HelperService,
     public constant: Constants
   ) { }
 
@@ -55,6 +38,14 @@ export class WeatherComponent implements OnInit {
     init(this);
   }
 
+  ngOnDestroy() {
+    if (this.subscription && !this.subscription.closed)
+      this.subscription.unsubscribe();
+    if (this.subscription1 && !this.subscription1.closed)
+      this.subscription1.unsubscribe();
+  }
+
+  // method to change unit
   setUnit(unit: string) {
     if (this.unit !== unit) {
       this.unit = unit;
@@ -67,44 +58,44 @@ export class WeatherComponent implements OnInit {
   removeCity(index) {
     this.weatherDetails.splice(index, 1);
   }
-  
+
   // event called when add city button clicked
   addCity() {
     this.submitClicked = true;
     let cityName = this.formGroup.get('cityName').value.trim();
     if (this.formGroup.valid && cityName.length > 0) {
       if (!this.weatherDetails.map(e => e.name.toLowerCase()).includes(cityName.toLowerCase())) {
-        // let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
         let temp = new WeatherDetails();
-        this.weatherService.getLatLon(cityName).subscribe(response => {
-          this.geoDetails = response[0];
+        this.subscription = this.weatherService.getLatLon(cityName).subscribe(response => {
+          let geoDetails = response[0];
           if (response[0]) {
-            temp.name = this.geoDetails.name;
-            this.weatherService.getWeatherPollution(this.geoDetails.lat, this.geoDetails.lon, this.unit).subscribe(resp => {
-              this.weatherDetails.push(addToTemp(temp, resp, this));
-              this.tempCities.push(cityName)
-              this.cd.markForCheck();
+            temp.name = geoDetails.name;
+            this.subscription1 = this.weatherService.getWeatherPollution(geoDetails.lat, geoDetails.lon, this.unit).subscribe(resp => {
+              // additional name check due to difference in city name returned by api
+              if (!this.weatherDetails.map(e => e.name.toLowerCase()).includes(temp.name.toLowerCase())) {
+                this.weatherDetails.push(addToTemp(temp, resp, this));
+
+                this.tempCities.push(cityName)
+                this.cd.markForCheck();
+              }
+              else {
+                this.helperService.openSnackBar(cityName.charAt(0).toUpperCase() + cityName.substring(1, cityName.length) + ' already added to list', "Error")
+              }
             });
             this.formGroup.patchValue({
               'cityName': ''
             })
             this.submitClicked = false;
           } else {
-            this.openSnackBar('City not found')
+            this.helperService.openSnackBar('City not found', "Error")
           }
         });
       } else {
-        this.openSnackBar(cityName.charAt(0).toUpperCase() + cityName.substring(1, cityName.length) + ' already added to list')
+        this.helperService.openSnackBar(cityName.charAt(0).toUpperCase() + cityName.substring(1, cityName.length) + ' already added to list', "Error")
       }
 
     }
 
-  }
-  // messages
-  openSnackBar(messageString: string) {
-    this._snackBar.open(messageString, "Error", {
-      duration: this.durationInSeconds * 1000,
-    });
   }
 
   // save city
@@ -116,7 +107,6 @@ export class WeatherComponent implements OnInit {
       this.savedCities.splice(this.savedCities.map(e => e.toLowerCase()).indexOf(a.toLowerCase()), 1);
     }
     localStorage.setItem('savedCities', this.savedCities.join())
-
     this.cd.markForCheck();
   }
 
@@ -129,7 +119,6 @@ export class WeatherComponent implements OnInit {
   }
 
   refreshBoard() {
-    // this.weatherDetails = [];
     this.citiesList = [];
     this.today = moment().format('MMMM Do YYYY, h:mm:ss a');
     init(this);
@@ -137,7 +126,10 @@ export class WeatherComponent implements OnInit {
 
   // load preset cities
   presetCities() {
+    this.today = moment().format('MMMM Do YYYY, h:mm:ss a');
     this.citiesList = [];
+    this.tempCities = [];
+    this.preset = true;
     init(this);
   }
   // clear all presets, favourites
@@ -151,38 +143,38 @@ export class WeatherComponent implements OnInit {
 }
 
 function init(context: WeatherComponent) {
+  context.today = moment().format('MMMM Do YYYY, h:mm:ss a');
   addFormValidation(context);
   context.weatherService.setformGroup(context.formGroup);
   context.weatherDetails = [];
   if (!context.changeUnit) {
-
     let savedCities = localStorage.getItem('savedCities');
-
     if (savedCities) {
-      context.savedCities = savedCities.split(',').map(e => e.trim());
-      context.savedCities.forEach(element => {
-        if (!context.citiesList.map(e => e.toLowerCase()).includes(element.toLowerCase())) {
-          context.citiesList.push(element);
-        }
-      });
+      if (!context.preset) {
+        context.savedCities = savedCities.split(',').map(e => e.trim());
+        context.savedCities.forEach(element => {
+          if (!context.citiesList.map(e => e.toLowerCase()).includes(element.toLowerCase())) {
+            context.citiesList.push(element);
+          }
+        });
 
-      if (context.tempCities) {
-        let listT = context.tempCities.filter(e => !context.citiesList.map(e => e.toLowerCase()).includes(e.toLowerCase()))
-        context.citiesList.push(...listT)
+      } else {
+        context.citiesList.push(...context.presetCitiesList);
       }
-    } else {
-      context.citiesList.push(...context.tempCitiesList);
+    }
+    if (context.tempCities) {
+      let listT = context.tempCities.filter(e => !context.citiesList.map(e => e.toLowerCase()).includes(e.toLowerCase()))
+      context.citiesList.push(...listT)
     }
   }
   context.changeUnit = false;
   context.citiesList.forEach(element => {
-    // let temp = { name: '', weather: '', lat: '', lon: '', temp: '', pollution: [], forcast: [], icon: '', humidity: '', wind: '' };
     let temp = new WeatherDetails();
-    context.weatherService.getLatLon(element).subscribe(response => {
+    context.subscription = context.weatherService.getLatLon(element).subscribe(response => {
       if (response[0]) {
-        context.geoDetails = response[0];
-        temp.name = context.geoDetails.name;
-        context.weatherService.getWeatherPollution(context.geoDetails.lat, context.geoDetails.lon, context.unit).subscribe(resp => {
+        let geoDetails = response[0];
+        temp.name = geoDetails.name;
+        context.subscription1 = context.weatherService.getWeatherPollution(geoDetails.lat, geoDetails.lon, context.unit).subscribe(resp => {
           if (resp)
             context.weatherDetails.push(addToTemp(temp, resp, context));
         });
@@ -191,20 +183,18 @@ function init(context: WeatherComponent) {
   });
 }
 
-// validation
+// formGroup
 function addFormValidation(context: WeatherComponent) {
   context.formGroup = new FormGroup({
     cityName: new FormControl('', Validators.required)
   })
 }
+
 // adding details to temp obj to add to list 
 function addToTemp(temp, resp: Array<any>, context: WeatherComponent) {
-  console.log(resp);
-
   temp.weather = resp[0]['list'][0].weather[0].description;
   temp.lat = resp[0]['city']['coord']['lat'];
   temp.lon = resp[0]['city']['coord']['lon'];
-  temp.name = resp[0]['city']['name']
   temp.temp = resp[0]['list'][0].main.temp;
   temp.forcast = resp[0]['list'];
   temp.icon = resp[0]['list'][0]['weather'][0]['icon'];

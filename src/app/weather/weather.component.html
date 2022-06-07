@@ -1,5 +1,5 @@
 <div class="container-fluid">
-    <form [formGroup]="formGroup">
+    <form [formGroup]="formGroup" *ngIf="formGroup">
         <div class="d-flex flex-row mt-5  d-flex justify-content-center justify-content-md-start">
             <div class="col-md-4">
                 <input type="text" formControlName="cityName" class="form-control" name="cityName"
@@ -30,7 +30,7 @@
         <div class="card m-5" style="margin: 5px;" *ngFor="let city of weatherDetails; let rec = index;"
             class="divBackground">
             <div><i (click)="removeCity(rec)" style="cursor: pointer;text-align: left;" matTooltip="Remove city"
-                    matTooltipPosition="below">x</i></div>
+                    matTooltipPosition="below" class="fa fa-times"></i></div>
             <div class="container">
                 <div style="text-align:right"><i class="fa fa-heart" matTooltip="Click to Save as favourite city"
                         matTooltipPosition="below" [ngStyle]="{'color': isSavedCity(city.name)?'red':''}"

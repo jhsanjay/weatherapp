@@ -1,7 +1,7 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { ApiService } from '../../helpers/api.service';
 import { WeatherComponent } from './weather.component';
 import { WeatherService } from './weather.service';
 
@@ -13,7 +13,10 @@ describe('WeatherComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [WeatherComponent],
-      imports: [HttpClientTestingModule, MatSnackBarModule]
+      imports: [
+        HttpClientTestingModule,
+        MatSnackBarModule,
+        ReactiveFormsModule]
     })
       .compileComponents();
   });
@@ -30,14 +33,14 @@ describe('WeatherComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should get data from apiService', () => {
+  it('should get data from apiService for city',  () => {
     fixture = TestBed.createComponent(WeatherComponent);
-    let city = 'Basildon'
+    let city = 'Singapore'
     let weatherService = fixture.debugElement.injector.get(WeatherService);
+    console.log(city);
+
     weatherService.getLatLon(city).subscribe(response => {
-      console.log(response);
-      fixture.detectChanges()
-      expect(response[0].name).toEqual('Mangalore');
+      expect(response.json()).toEqual({ success: true });
     });
   });
 });
