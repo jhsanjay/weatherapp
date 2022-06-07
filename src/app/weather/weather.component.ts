@@ -161,6 +161,8 @@ function init(context: WeatherComponent) {
       } else {
         context.citiesList.push(...context.presetCitiesList);
       }
+    }else {
+      context.citiesList.push(...context.presetCitiesList);
     }
     if (context.tempCities) {
       let listT = context.tempCities.filter(e => !context.citiesList.map(e => e.toLowerCase()).includes(e.toLowerCase()))
