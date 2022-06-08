@@ -40,13 +40,13 @@
                 <span>
                     <h3>
                         <img src="{{'assets/images/icon_list/'+city.icon+'.png'}}" [matTooltip]="city.weather"
-                            matTooltipPosition="below">
+                            matTooltipPosition="below" height="100px" width="100px">
                         {{city.temp}}
                         <span *ngIf="unit=='metric'">°C</span>
                         <span *ngIf="unit=='imperial'">°F</span>
                     </h3>
                 </span>
-                <p>Humidity:{{city.humidity}}%</p>
+                <p>Humidity: {{city.humidity}}%</p>
                 <p>Wind: {{city.wind}} m/s</p>
                 <hr>
                 <mat-tab-group>
@@ -58,7 +58,7 @@
                                         <b>{{forcast.dt_txt | date:'dd/MM'}}</b><br>
                                         <b>{{forcast.dt_txt | date:'h a'}}</b><br>
                                         <img src="{{'assets/images/icon_list/'+forcast.weather[0].icon+'.png'}}"
-                                            [matTooltip]="forcast.weather[0].description"
+                                            [matTooltip]="forcast.weather[0].description" height="100px" width="100px"
                                             matTooltipPosition="below"><br>
                                         {{forcast.main.temp_max}}° {{forcast.main.temp_max}}°<br>
                                     </div>
@@ -69,20 +69,29 @@
                     <mat-tab label="Pollution">
                         <table class="mt-5 table w-100">
                             <tr>
-                                <td><b>co</b>: {{city.pollution['co']}}</td>
-                                <td><b>nh3</b>: {{city.pollution['nh3']}}</td>
+                                <td><span>CO</span>(Carbon monoxide): {{city.pollution['co']}} μg/m3</td>
                             </tr>
                             <tr>
-                                <td><b>no</b>: {{city.pollution['no']}}</td>
-                                <td><b>no2</b>: {{city.pollution['no2']}}</td>
+                                <td> <span>NH<sub>3</sub></span>(Ammonia): {{city.pollution['nh3']}} μg/m3</td>
                             </tr>
                             <tr>
-                                <td><b>o3</b>: {{city.pollution['o3']}}</td>
-                                <td><b>pm2_5</b>: {{city.pollution['pm2_5']}}</td>
+                                <td><span>NO</span>(Nitrogen monoxide): {{city.pollution['no']}} μg/m3</td>
                             </tr>
                             <tr>
-                                <td><b>pm10</b>: {{city.pollution['pm10']}}</td>
-                                <td><b>so2</b>: {{city.pollution['so2']}}</td>
+                                <td><span>NO<sub>2</sub></span>(Nitrogen dioxide): {{city.pollution['no2']}} μg/m3</td>
+                            </tr>
+                            <tr>
+                                <td><span>O<sub>3</sub></span>(Ozone): {{city.pollution['o3']}} μg/m3</td>
+                            </tr>
+                            <tr>
+                                <td><span>PM<sub>2.5</sub></span>(Fine particles matter): {{city.pollution['pm2_5']}} μg/m3
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><span>PM<sub>10</sub></span>(Coarse particulate matter): {{city.pollution['pm10']}} μg/m3</td>
+                            </tr>
+                            <tr>
+                                <td><span>SO<sub>2</sub></span>(Sulphur dioxide): {{city.pollution['so2']}} μg/m3</td>
                             </tr>
                         </table>
                     </mat-tab>
