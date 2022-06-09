@@ -2,6 +2,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { BehaviorSubject } from 'rxjs';
 import { WeatherComponent } from './weather.component';
 import { WeatherService } from './weather.service';
 
@@ -15,8 +16,9 @@ describe('WeatherComponent', () => {
       declarations: [WeatherComponent],
       imports: [
         HttpClientTestingModule,
-        MatSnackBarModule,
-        ReactiveFormsModule]
+        ReactiveFormsModule,
+        MatSnackBarModule
+      ]
     })
       .compileComponents();
   });
@@ -33,14 +35,33 @@ describe('WeatherComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it('should get data from apiService for city',  () => {
+  it('preset cities count', () => {
+    fixture = TestBed.createComponent(WeatherComponent);
+    let app = fixture.debugElement.componentInstance;
+    expect(app.presetCitiesList.length).toEqual(3);
+  });
+
+  it('It should console lat and lon for Singapore', () => {
     fixture = TestBed.createComponent(WeatherComponent);
     let city = 'Singapore'
     let weatherService = fixture.debugElement.injector.get(WeatherService);
-    console.log(city);
-
-    weatherService.getLatLon(city).subscribe(response => {
-      expect(response.json()).toEqual({ success: true });
+    const apiResponse = [
+      {
+        country: "SG",
+        lat: 1.2904753,
+        local_names: { pl: "Singapur", wo: "Singapoor", na: "Tsingapoar", fr: "Singapour", gd: "Singeapòr", gu: "સિંગાપુર" },
+        lon: 103.8520359,
+        name: "Singapore"
+      }
+    ];
+    let response;
+    spyOn(weatherService, 'getLatLon').and.returnValue(new BehaviorSubject(apiResponse));
+    weatherService.getLatLon(city).subscribe(res => {
+      response = res;
+      expect(response[0].name).toEqual(city);
+      console.log('Singapore - Lat:'+response[0].lat + ', Lon:'+response[0].lon);
     });
+  
   });
 });
+

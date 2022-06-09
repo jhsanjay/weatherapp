@@ -17,7 +17,8 @@ describe('HelperService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should show snackbar', () => {
-    service.openSnackBar('Hello message from service testing', "Info");
+  it('should show snackbar with message', () => {
+    let message = 'Hello message from service testing';
+    service.openSnackBar(message, "Info");
   });
 });

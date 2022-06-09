@@ -18,6 +18,4 @@ describe('ApiService', () => {
     service = TestBed.inject(ApiService);
     expect(service).toBeTruthy();
   });
-
-  
 });
