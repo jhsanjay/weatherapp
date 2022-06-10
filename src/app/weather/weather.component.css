@@ -2,17 +2,18 @@
     background-image: url(../../assets/images/bg.jpg);
     background-repeat: no-repeat;
     background-size: cover;
-    opacity: 0.8;
+    /* opacity: 0.8; */
     border: 1px solid darkgrey;
     width: 400px;
     padding: 15px;
-    color: black
+    color: black;
+    background-color: white;
 }
 
 .cardBg {
     padding: 5px;
-    width: 180px;
-    margin-right: 5px;
+    width: 140px;
+    margin-right:5px;
     background-color: transparent;
     border: transparent;
     color: black

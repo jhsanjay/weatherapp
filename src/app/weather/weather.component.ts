@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment';
-import { Subscription } from 'rxjs';
+import { interval, Subscription } from 'rxjs';
 import { Constants } from '../../helpers/constants';
 import { HelperService } from '../../helpers/helper.service';
 import { WeatherDetails } from '../../helpers/weather-details.model';
@@ -17,7 +17,7 @@ export class WeatherComponent implements OnInit {
   formGroup: FormGroup;
   unit: string = 'metric';
   today;
-  presetCitiesList = ['Mangalore', 'Singapore', 'Bangalore'];
+  presetCitiesList = ['Mangalore', 'Bangalore', 'Mysore', 'Delhi'];
   weatherDetails: Array<WeatherDetails> = [];
   savedCities: string[] = [];
   tempCities: string[] = [];
@@ -27,6 +27,7 @@ export class WeatherComponent implements OnInit {
   subscription: Subscription;
   subscription1: Subscription;
   preset: boolean;
+  sub: Subscription;
 
   constructor(public weatherService: WeatherService,
     public cd: ChangeDetectorRef,
@@ -36,6 +37,7 @@ export class WeatherComponent implements OnInit {
 
   ngOnInit(): void {
     init(this);
+
   }
 
   ngOnDestroy() {
@@ -50,7 +52,7 @@ export class WeatherComponent implements OnInit {
     if (this.unit !== unit) {
       this.unit = unit;
       this.changeUnit = true;
-      init(this);
+      refreshBoardData(this);
     }
   }
 
@@ -119,9 +121,8 @@ export class WeatherComponent implements OnInit {
   }
 
   refreshBoard() {
-    this.citiesList = [];
     this.today = moment().format('MMMM Do YYYY, h:mm:ss a');
-    init(this);
+    refreshBoardData(this);
   }
 
   // load preset cities
@@ -132,12 +133,13 @@ export class WeatherComponent implements OnInit {
     this.preset = true;
     init(this);
   }
+
   // clear all presets, favourites
   clearCities() {
     this.citiesList = [];
     this.tempCities = [];
     this.weatherDetails = [];
-    localStorage.setItem("savedCities", "");
+    localStorage.removeItem("savedCities");
     this.cd.markForCheck();
   }
 }
@@ -146,43 +148,12 @@ function init(context: WeatherComponent) {
   context.today = moment().format('MMMM Do YYYY, h:mm:ss a');
   addFormValidation(context);
   context.weatherService.setformGroup(context.formGroup);
-  context.weatherDetails = [];
-  if (!context.changeUnit) {
-    let savedCities = localStorage.getItem('savedCities');
-    if (savedCities) {
-      if (!context.preset) {
-        context.savedCities = savedCities.split(',').map(e => e.trim());
-        context.savedCities.forEach(element => {
-          if (!context.citiesList.map(e => e.toLowerCase()).includes(element.toLowerCase())) {
-            context.citiesList.push(element);
-          }
-        });
-
-      } else {
-        context.citiesList.push(...context.presetCitiesList);
-      }
-    }else {
-      context.citiesList.push(...context.presetCitiesList);
-    }
-    if (context.tempCities) {
-      let listT = context.tempCities.filter(e => !context.citiesList.map(e => e.toLowerCase()).includes(e.toLowerCase()))
-      context.citiesList.push(...listT)
-    }
-  }
   context.changeUnit = false;
-  context.citiesList.forEach(element => {
-    let temp = new WeatherDetails();
-    context.subscription = context.weatherService.getLatLon(element).subscribe(response => {
-      if (response[0]) {
-        let geoDetails = response[0];
-        temp.name = geoDetails.name;
-        context.subscription1 = context.weatherService.getWeatherPollution(geoDetails.lat, geoDetails.lon, context.unit).subscribe(resp => {
-          if (resp)
-            context.weatherDetails.push(addToTemp(temp, resp, context));
-        });
-      }
-    });
-  });
+  resetCitiesList(context);
+  getCardData(context);
+  context.sub = interval(50000).subscribe((() => {
+    refreshBoardData(context);
+  }))
 }
 
 // formGroup
@@ -205,4 +176,69 @@ function addToTemp(temp, resp: Array<any>, context: WeatherComponent) {
   temp.description = resp[0]['list'][0]['weather'][0]['description'];
   temp.pollution = resp[1]['list'][0]['components']
   return temp;
+}
+
+function resetCitiesList(context: WeatherComponent) {
+  context.weatherDetails.splice(0);
+  context.citiesList.splice(0);
+  if (!context.changeUnit) {
+    let savedCities = localStorage.getItem('savedCities');
+    if (savedCities) {
+      if (!context.preset) {
+        context.savedCities = savedCities.split(',').map(e => e.trim());
+        context.savedCities.forEach(element => {
+          if (!context.citiesList.map(e => e.toLowerCase()).includes(element.toLowerCase())) {
+            context.citiesList.push(element);
+          }
+        });
+
+      } else {
+        context.citiesList.push(...context.presetCitiesList);
+      }
+    } else {
+      context.citiesList.push(...context.presetCitiesList);
+    }
+    if (context.tempCities) {
+      let listT = context.tempCities.filter(e => !context.citiesList.map(e => e.toLowerCase()).includes(e.toLowerCase()))
+      context.citiesList.push(...listT)
+    }
+  }
+}
+
+function getCardData(context: WeatherComponent) {
+  context.citiesList.forEach(element => {
+    let temp = new WeatherDetails();
+    context.subscription = context.weatherService.getLatLon(element).subscribe(response => {
+      if (response[0]) {
+        let geoDetails = response[0];
+        temp.name = geoDetails.name;
+        context.subscription1 = context.weatherService.getWeatherPollution(geoDetails.lat, geoDetails.lon, context.unit).subscribe(resp => {
+          if (resp)
+            context.weatherDetails.push(addToTemp(temp, resp, context));
+          context.cd.detectChanges();
+        });
+      }
+    });
+  });
+}
+
+function refreshBoardData(context: WeatherComponent) {
+  console.log(context.weatherDetails);
+  if (context.weatherDetails.length > 0) {
+    context.weatherDetails.forEach(element => {
+      context.subscription1 = context.weatherService.getWeatherPollution(+element.lat, +element.lon, context.unit).subscribe(resp => {
+        if (resp) {
+          element.weather = resp[0]['list'][0].weather[0].description;
+          element.temp = resp[0]['list'][0].main.temp;
+          element.forcast = resp[0]['list'];
+          element.icon = resp[0]['list'][0]['weather'][0]['icon'];
+          element.humidity = resp[0]['list'][0]['main']['humidity'];
+          element.wind = resp[0]['list'][0]['wind']['speed'];
+          element.description = resp[0]['list'][0]['weather'][0]['description'];
+          element.pollution = resp[1]['list'][0]['components']
+          context.cd.detectChanges();
+        }
+      });
+    });
+  }
 }

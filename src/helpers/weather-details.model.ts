@@ -9,4 +9,5 @@ export class WeatherDetails {
     icon: string = '';
     humidity: string = '';
     wind: string = '';
+    description: string = '';
   }

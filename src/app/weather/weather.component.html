@@ -11,7 +11,7 @@
                 <button type="button" (click)="addCity()" class="btn btn-primary">Add City</button>
             </div>
         </div>
-        <div class="row" style="text-align: right">
+        <div class="row" style="text-align: right;">
             <i>{{today}}</i>
         </div>
     </form>
@@ -31,7 +31,7 @@
             class="divBackground">
             <div><i (click)="removeCity(rec)" style="cursor: pointer;text-align: left;" matTooltip="Remove city"
                     matTooltipPosition="below" class="fa fa-times"></i></div>
-            <div class="container">
+            <div class="container" style="padding:1px;">
                 <div style="text-align:right"><i class="fa fa-heart" matTooltip="Click to Save as favourite city"
                         matTooltipPosition="below" [ngStyle]="{'color': isSavedCity(city.name)?'red':''}"
                         (click)="saveCity(city.name)" style="cursor: pointer;"></i></div>
@@ -54,7 +54,7 @@
                         <div class="d-flex flex-row justify-content-center justify-content-md-start">
                             <div *ngFor="let forcast of city.forcast" class=" mt-5">
                                 <div class="card cardBg">
-                                    <div class="container" style="text-align: center;">
+                                    <div class="container" style="text-align: center">
                                         <b>{{forcast.dt_txt | date:'dd/MM'}}</b><br>
                                         <b>{{forcast.dt_txt | date:'h a'}}</b><br>
                                         <img src="{{'assets/images/icon_list/'+forcast.weather[0].icon+'.png'}}"
