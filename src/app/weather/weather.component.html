@@ -2,7 +2,7 @@
     <form [formGroup]="formGroup" *ngIf="formGroup">
         <div class="d-flex flex-row mt-5  d-flex justify-content-center justify-content-md-start">
             <div class="col-md-4">
-                <input type="text" formControlName="cityName" class="form-control" name="cityName"
+                <input type="text" formControlName="cityName" class="form-control" id="cityName" name="cityName"
                     placeholder="Search by city" required (keydown.enter)="addCity()" required>
                 <div class="error" *ngIf="formGroup.get('cityName').hasError('required') && submitClicked">
                     {{constant.cityNameError}}</div>
@@ -17,7 +17,8 @@
     </form>
     <hr>
     <div class="mt-5 d-flex justify-content-center justify-content-md-start">
-        <button class="btn btn-secondary" (click)="presetCities()">Pre-set Cities</button>
+        <button class="btn btn-secondary presetCities" (click)="presetCities()" id="presetCities">Pre-set
+            Cities</button>
         <button class="btn btn-secondary" style="margin-left:15px;" (click)="clearCities()">Clear All</button>
         <button class="btn btn-secondary" style="text-align: right;margin-left:15px;" (click)="setUnit('metric')"
             [disabled]="unit=='metric'">°C</button>
@@ -60,7 +61,8 @@
                                         <img src="{{'assets/images/icon_list/'+forcast.weather[0].icon+'.png'}}"
                                             [matTooltip]="forcast.weather[0].description" height="100px" width="100px"
                                             matTooltipPosition="below"><br>
-                                        {{forcast.main.temp_max}}° {{forcast.main.temp_max}}°<br>
+                                        {{forcast.main.temp_max | number : '1.0-0'}}°
+                                        {{forcast.main.temp_max | number : '1.0-0'}}°
                                     </div>
                                 </div>
                             </div>
@@ -84,11 +86,13 @@
                                 <td><span>O<sub>3</sub></span>(Ozone): {{city.pollution['o3']}} μg/m3</td>
                             </tr>
                             <tr>
-                                <td><span>PM<sub>2.5</sub></span>(Fine particles matter): {{city.pollution['pm2_5']}} μg/m3
+                                <td><span>PM<sub>2.5</sub></span>(Fine particles matter): {{city.pollution['pm2_5']}}
+                                    μg/m3
                                 </td>
                             </tr>
                             <tr>
-                                <td><span>PM<sub>10</sub></span>(Coarse particulate matter): {{city.pollution['pm10']}} μg/m3</td>
+                                <td><span>PM<sub>10</sub></span>(Coarse particulate matter): {{city.pollution['pm10']}}
+                                    μg/m3</td>
                             </tr>
                             <tr>
                                 <td><span>SO<sub>2</sub></span>(Sulphur dioxide): {{city.pollution['so2']}} μg/m3</td>

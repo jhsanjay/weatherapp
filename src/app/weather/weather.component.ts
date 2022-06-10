@@ -16,6 +16,7 @@ export class WeatherComponent implements OnInit {
 
   formGroup: FormGroup;
   unit: string = 'metric';
+  cityName= 'Bangalore';
   today;
   presetCitiesList = ['Mangalore', 'Bangalore', 'Mysore', 'Delhi'];
   weatherDetails: Array<WeatherDetails> = [];
